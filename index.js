@@ -83,10 +83,29 @@ const db = mysql.createConnection(
     ON ro.department_id = dep.id
     ORDER BY ro.id;
     `
-
       db.query(sql, (error, result) => {
           if(error) throw error;
           console.table(result);
           mainMenu(); 
       })
+  }
+
+//NOT DISPLAYING EMPLOYEES THAT HAVE NO MANAGERS
+  function viewEmployees() {
+      let sql = `
+      SELECT emp.id, emp.first_name, emp.last_name, ro.title, dep.name AS department, ro.salary, CONCAT(m.first_name, " ", m.last_name) AS reports_to
+      FROM employees AS emp
+      JOIN roles AS ro
+      ON emp.role_id = ro.id
+      JOIN departments AS dep
+      ON ro.department_id = dep.id
+      JOIN employees m
+      ON emp.manager_id = m.id
+      ORDER BY emp.id;
+      `
+      db.query(sql, (error, result) => {
+        if(error) throw error;
+        console.table(result);
+        mainMenu(); 
+    })
   }
