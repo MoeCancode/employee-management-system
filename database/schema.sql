@@ -7,7 +7,7 @@ USE corporation;
 CREATE TABLE departments (
     id INT AUTO_INCREMENT,
     name VARCHAR(30),
-    
+
     PRIMARY KEY(id) 
 );
 
@@ -20,7 +20,6 @@ CREATE TABLE roles (
 
     PRIMARY KEY(id),
     FOREIGN KEY (department_id) REFERENCES departments(id)
-    ON DELETE SET NULL 
 );
 
 -- Cretae employees table
@@ -29,9 +28,9 @@ CREATE TABLE employees (
     first_name VARCHAR(30),
     last_name VARCHAR(30),
     role_id INT,
-    manager_id INT
+    manager_id INT, 
 
     PRIMARY KEY(id),
-    FOREIGN KEY (role_id) REFERENCES roles(id)
-    ON DELETE SET NULL 
+    FOREIGN KEY(role_id) REFERENCES roles(id),
+    FOREIGN KEY(manager_id) REFERENCES employees(id)
 );
