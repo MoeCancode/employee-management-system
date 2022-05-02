@@ -1,14 +1,15 @@
 const inquirer = require("inquirer");
 const ctab = require("console.table");
 const mysql = require("mysql2");
-const Choices = require("inquirer/lib/objects/choices");
+
+const questions = ["VIEW ALL DEPARTMENTS", "VIEW ALL ROLES", "VIEW ALL EMPLOYEES", "ADD A DEPARTMENT", "ADD A ROLE", "ADD AN EMPLOYEE", "UPDATE EMPLOYEE ROLE", "CALL IT A DAY"];
 
 const db = mysql.createConnection(
     {
       host: 'localhost',
       user: 'root',
       password: 'okokokok',
-      database: 'corporate',
+      database: 'corporation',
       multipleStatements: true
     },
     console.log("Connected to corporate database"),
@@ -17,11 +18,10 @@ const db = mysql.createConnection(
   starterFunction();
 
   function starterFunction() {
-      console.log("WELCOME TO THE EMPLOYEE MANAGEMENT SYSTEM \n");
+      console.log("\n WELCOME TO THE EMPLOYEE MANAGEMENT SYSTEM \n");
       mainMenu();
   }
 
-const questions = ["VIEW ALL DEPARTMENTS", "VIEW ALL ROLES", "VIEW ALL EMPLOYEES", "ADD A DEPARTMENT", "ADD A ROLE", "ADD AN EMPLOYEE", "UPDATE EMPLOYEE ROLE", "CALL IT A DAY"];
 
   function mainMenu() {
       inquirer.prompt([
@@ -29,32 +29,64 @@ const questions = ["VIEW ALL DEPARTMENTS", "VIEW ALL ROLES", "VIEW ALL EMPLOYEES
               name: "chooseOption",
               type: "list",
               message: "CHOOSE AN OPTION: ",
-              choice: questions  
+              choices: questions  
           }
       ]).then(data => {
-        if(data == questions[0]) {
+        if(data.chooseOption == questions[0]) {
             viewDepartment();
         }
-        else if(data == questions[1]) {
+        else if(data.chooseOption == questions[1]) {
             viewRoles();
         }
-        else if(data == questions[2]) {
+        else if(data.chooseOption == questions[2]) {
             viewEmployees();
         }
-        else if(data == questions[3]) {
+        else if(data.chooseOption == questions[3]) {
             addDepartment();
         }
-        else if(data == questions[4]) {
+        else if(data.chooseOption == questions[4]) {
             addRole();
         }
-        else if(data == questions[5]) {
+        else if(data.chooseOption == questions[5]) {
             addEmployee();
         }
-        else if(data == questions[6]) {
+        else if(data.chooseOption == questions[6]) {
             updateEmployeeRole();
         }
-        else if(data == questions[7]) {
+        else if(data.chooseOption == questions[7]) {
             okBye();
         }
+        else {
+            console.log(data);
+            console.log(questions[0]);
+        }
+      })
+  }
+
+  function viewDepartment() {
+    
+    let sql = `SELECT * FROM departments`;
+    db.query(sql, (error,result) =>{
+      if (error) throw error;
+    //   console.log(result);
+      console.table(result);
+      mainMenu();
+    });
+  }
+
+  function viewRoles() {
+
+    let sql = `
+    SELECT ro.id, ro.title, dep.name AS department, ro.salary
+    FROM roles AS ro
+    JOIN departments AS dep
+    ON ro.department_id = dep.id
+    ORDER BY ro.id;
+    `
+
+      db.query(sql, (error, result) => {
+          if(error) throw error;
+          console.table(result);
+          mainMenu(); 
       })
   }
