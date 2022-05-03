@@ -135,22 +135,20 @@ function addDepartment() {
 }
 
 function addRole() {
-
-    let currentDepartments = [];
-    let sql1 = `SELECT * FROM departments`;
+  let currentDepartments = [];
+  let sql1 = `SELECT * FROM departments`;
   db.query(sql1, (error, result) => {
     if (error) throw error;
-    
-    let i = 0;
-    while(result[i]) {
-        currentDepartments.push(result[i].name);
-        i++;
-    }
-    console.log("curent departments are: " + currentDepartments);
-  });
-    
 
-    inquirer
+    let i = 0;
+    while (result[i]) {
+      currentDepartments.push(result[i].name);
+      i++;
+    }
+    // console.log("curent departments are: " + currentDepartments);
+  });
+
+  inquirer
     .prompt([
       {
         name: "roleName",
@@ -158,25 +156,25 @@ function addRole() {
         type: "input",
       },
       {
-          name: "roleSalary",
-          message: "WHAT IS THE SALARY FOR THIS ROLE?",
-          type: "input"
+        name: "roleSalary",
+        message: "WHAT IS THE SALARY FOR THIS ROLE?",
+        type: "input",
       },
       {
-          name: "roleDepartment",
-          message: "CHOOSE THE DEPARTMENT THIS ROLE BELONGS TO: ",
-          type: "list",
-          choices: currentDepartments
-      }
+        name: "roleDepartment",
+        message: "CHOOSE THE DEPARTMENT THIS ROLE BELONGS TO: ",
+        type: "list",
+        choices: currentDepartments,
+      },
     ])
     .then((answer) => {
-        let dep_id = 0;
-        for(let x = 0; x < currentDepartments.length; x++) {
-            if(answer.roleDepartment == currentDepartments[x]) {
-                dep_id = x + 1;
-            }
+      let dep_id = 0;
+      for (let x = 0; x < currentDepartments.length; x++) {
+        if (answer.roleDepartment == currentDepartments[x]) {
+          dep_id = x + 1;
         }
-        console.log("department ID is: " + dep_id );
+      }
+      // console.log("department ID is: " + dep_id);
       let sql = `
           INSERT INTO roles (title, salary, department_id)
           VALUES ('${answer.roleName}', ${answer.roleSalary}, ${dep_id});
@@ -188,5 +186,92 @@ function addRole() {
         );
         mainMenu();
       });
+    });
+}
+
+function addEmployee() {
+  //Making an array containing all roles
+  let allRoles = [];
+  let sql1 = `SELECT * FROM roles`;
+  db.query(sql1, (error, result) => {
+    if (error) throw error;
+
+    let i = 0;
+    while (result[i]) {
+      allRoles.push(result[i].title);
+      i++;
+    }
+    // console.log("curent roles are: " + allRoles);
+  });
+
+  //Making an array containing all employees
+  let allEmployees = [];
+  let sql2 = `SELECT * FROM employees`;
+  db.query(sql2, (error, result) => {
+    if (error) throw error;
+
+    let z = 0;
+    while (result[z]) {
+      let fullName = `${result[z].first_name} ${result[z].last_name}`;
+      allEmployees.push(fullName);
+      z++;
+    }
+    // console.log("All employees are: " + allEmployees);
+  });
+
+  inquirer
+    .prompt([
+      {
+        name: "first",
+        message: "ENTER EMPLOYEE'S FIRST NAME: ",
+        type: "input",
+      },
+      {
+        name: "last",
+        message: "ENTER EMPLOYEE'S LAST NAME: ",
+        type: "input",
+      },
+      {
+        name: "whatRole",
+        message: "SELECT THE EMPLOYEE'S ROLE: ",
+        type: "list",
+        choices: allRoles,
+      },
+      {
+        name: "reportsTo",
+        message: "CHOOSE THE PERSON THIS EMPLOYEE REPORTS TO: ",
+        type: "list",
+        choices: allEmployees,
+      },
+    ])
+    .then((answer) => {
+      let role_id = 0;
+      for (let x = 0; x < allRoles.length; x++) {
+        if (answer.whatRole == allRoles[x]) {
+          role_id = x + 1;
+        }
+      }
+      // console.log("Role ID is: " + role_id);
+      let boss_id = 0;
+      for (let q = 0; q < allEmployees.length; q++) {
+        if (
+          answer.reportsTo ==
+          `${allEmployees[q].first_name} ${allEmployees[q].last_name}`
+        ) {
+          boss_id = q + 1;
+        }
+      }
+
+      let sql = `
+    INSERT INTO employees (first_name, last_name, role_id, manager_id)
+    VALUES ("${answer.first}", "${answer.last}", ${role_id}, ${boss_id});
+    `;
+    db.query(sql, (error, result) => {
+      if (error) throw error;
+      console.log(
+        `EMPLOYEE, ${answer.first} ${answer.last} ADDED! `
+      );
+      mainMenu();
+    });
     });
 }
