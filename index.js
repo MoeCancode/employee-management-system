@@ -127,7 +127,7 @@ function addDepartment() {
       db.query(sql, (error, result) => {
         if (error) throw error;
         console.log(
-          `DEPARTMENT ${answer.depName} HAS BEEN SUCCESSFULLY ADDED! `
+          `\n DEPARTMENT ${answer.depName} HAS BEEN SUCCESSFULLY ADDED! \n `
         );
         mainMenu();
       });
@@ -174,7 +174,6 @@ function addRole() {
           dep_id = x + 1;
         }
       }
-      // console.log("department ID is: " + dep_id);
       let sql = `
           INSERT INTO roles (title, salary, department_id)
           VALUES ('${answer.roleName}', ${answer.roleSalary}, ${dep_id});
@@ -182,7 +181,7 @@ function addRole() {
       db.query(sql, (error, result) => {
         if (error) throw error;
         console.log(
-          `ROLE ${answer.roleName} CREATED WITH SALARY:  ${answer.roleSalary} `
+          `\n ROLE ${answer.roleName} CREATED WITH SALARY:  ${answer.roleSalary} \n  `
         );
         mainMenu();
       });
@@ -201,7 +200,6 @@ function addEmployee() {
       allRoles.push(result[i].title);
       i++;
     }
-    // console.log("curent roles are: " + allRoles);
   });
 
   //Making an array containing all employees
@@ -251,16 +249,13 @@ function addEmployee() {
           role_id = x + 1;
         }
       }
-      // console.log("Role ID is: " + role_id);
       let boss_id = 0;
       for (let q = 0; q < allEmployees.length; q++) {
-        if (
-          answer.reportsTo ==
-          `${allEmployees[q].first_name} ${allEmployees[q].last_name}`
-        ) {
+        if (answer.reportsTo == allEmployees[q])
+        {
           boss_id = q + 1;
         }
-      }
+      } 
 
       let sql = `
     INSERT INTO employees (first_name, last_name, role_id, manager_id)
@@ -269,7 +264,7 @@ function addEmployee() {
     db.query(sql, (error, result) => {
       if (error) throw error;
       console.log(
-        `EMPLOYEE, ${answer.first} ${answer.last} ADDED! `
+        `\n EMPLOYEE, ${answer.first} ${answer.last} ADDED! \n `
       );
       mainMenu();
     });
