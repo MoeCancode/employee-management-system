@@ -137,17 +137,17 @@ function addDepartment() {
 }
 
 function addRole() {
-  let currentDepartments = [];
+  let allDepartments = [];
   let sql1 = `SELECT * FROM departments`;
   db.query(sql1, (error, result) => {
     if (error) throw error;
 
     let i = 0;
     while (result[i]) {
-      currentDepartments.push(result[i].name);
+      allDepartments.push(result[i].name);
       i++;
     }
-    // console.log("curent departments are: " + currentDepartments);
+    // console.log("curent departments are: " + allDepartments);
   });
 
   inquirer
@@ -166,13 +166,13 @@ function addRole() {
         name: "roleDepartment",
         message: "CHOOSE THE DEPARTMENT THIS ROLE BELONGS TO: ",
         type: "list",
-        choices: currentDepartments,
+        choices: allDepartments,
       },
     ])
     .then((answer) => {
       let dep_id = 0;
-      for (let x = 0; x < currentDepartments.length; x++) {
-        if (answer.roleDepartment == currentDepartments[x]) {
+      for (let x = 0; x < allDepartments.length; x++) {
+        if (answer.roleDepartment == allDepartments[x]) {
           dep_id = x + 1;
         }
       }
@@ -191,32 +191,11 @@ function addRole() {
 }
 
 function addEmployee() {
-  //Making an array containing all roles
-  let allRoles = [];
-  let sql1 = `SELECT * FROM roles`;
-  db.query(sql1, (error, result) => {
-    if (error) throw error;
+  //Calling helper function
+  let allRoles = getAllRoles();
 
-    let i = 0;
-    while (result[i]) {
-      allRoles.push(result[i].title);
-      i++;
-    }
-  });
-
-  //Making an array containing all employees
-  let allEmployees = [];
-  let sql2 = `SELECT * FROM employees`;
-  db.query(sql2, (error, result) => {
-    if (error) throw error;
-
-    let z = 0;
-    while (result[z]) {
-      let fullName = `${result[z].first_name} ${result[z].last_name}`;
-      allEmployees.push(fullName);
-      z++;
-    }
-  });
+  //Calling helper function
+  let allEmployees = getAllEmployees();
 
   inquirer
     .prompt([
@@ -270,30 +249,10 @@ function addEmployee() {
 }
 
 function updateEmployeeRole() {
-  //Making an array containing all employees
-  let employeeList = [];
-  let sql2 = `SELECT * FROM employees`;
-  db.query(sql2, (error, result) => {
-    if (error) throw error;
-    let z = 0;
-    while (result[z]) {
-      let fullName = `${result[z].first_name} ${result[z].last_name}`;
-      employeeList.push(fullName);
-      z++;
-    }
-  }); 
-  //Making an array containing all roles
-  var allRoles = [];
-  let sql1 = `SELECT * FROM roles`;
-  db.query(sql1, (error, result) => {
-    if (error) throw error;
-
-    let i = 0;
-    while (result[i]) {
-      allRoles.push(result[i].title);
-      i++;
-    }
-  });
+ //Calling helper function
+  let allEmployees = getAllEmployees(); 
+ //Calling helper function
+  let allRoles = getAllRoles();
 
   inquirer
     .prompt([
@@ -307,7 +266,7 @@ function updateEmployeeRole() {
         name: "whatEmployee",
         message: "SELECT THE EMPLOYEE YOU WANT TO UPDATE: \n",
         type: "list",
-        choices: employeeList
+        choices: allEmployees
       },
       {
         name: "whatRole",
@@ -325,8 +284,8 @@ function updateEmployeeRole() {
       }
 
       let idOfEmployee = 0;
-      for (let u = 0; u < employeeList.length; u++) {
-        if (answer.whatEmployee == employeeList[u]) {
+      for (let u = 0; u < allEmployees.length; u++) {
+        if (answer.whatEmployee == allEmployees[u]) {
           idOfEmployee = u + 1;
         }
       }
@@ -344,4 +303,39 @@ function updateEmployeeRole() {
         mainMenu();
       });
     });
+}
+
+
+//HELPER FUNCTION for getting employees
+function getAllEmployees() {
+  //Making an array containing all employees
+  let allEmployees = [];
+  let sql2 = `SELECT * FROM employees`;
+  db.query(sql2, (error, result) => {
+    if (error) throw error;
+
+    let z = 0;
+    while (result[z]) {
+      let fullName = `${result[z].first_name} ${result[z].last_name}`;
+      allEmployees.push(fullName);
+      z++;
+    }
+  });
+  return allEmployees;
+}
+
+//HELPER FUNCTION for getting roles
+function getAllRoles() {
+  var allRoles = [];
+  let sql1 = `SELECT * FROM roles`;
+  db.query(sql1, (error, result) => {
+    if (error) throw error;
+
+    let i = 0;
+    while (result[i]) {
+      allRoles.push(result[i].title);
+      i++;
+    }
+  });
+  return allRoles;
 }
