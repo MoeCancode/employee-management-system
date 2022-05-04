@@ -248,6 +248,11 @@ function addEmployee() {
     });
 }
 
+function okBye() {
+  console.log("\n GOODBYE!");
+  db.end();
+}
+
 function updateEmployeeRole() {
   //Calling helper function
   let allEmployees = getAllEmployees();
