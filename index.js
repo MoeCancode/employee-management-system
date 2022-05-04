@@ -271,23 +271,17 @@ function addEmployee() {
 
 function updateEmployeeRole() {
   //Making an array containing all employees
-  let EmployeeList = [];
+  let employeeList = [];
   let sql2 = `SELECT * FROM employees`;
   db.query(sql2, (error, result) => {
     if (error) throw error;
-
     let z = 0;
     while (result[z]) {
       let fullName = `${result[z].first_name} ${result[z].last_name}`;
-      EmployeeList.push(fullName);
+      employeeList.push(fullName);
       z++;
     }
-    
   }); 
-  console.log(EmployeeList);
-
-  
-
   //Making an array containing all roles
   var allRoles = [];
   let sql1 = `SELECT * FROM roles`;
@@ -301,47 +295,53 @@ function updateEmployeeRole() {
     }
   });
 
-  // inquirer
-  //   .prompt([
-  //     {
-  //       name: "whatEmployee",
-  //       message: "SELECT THE EMPLOYEE YOU WANT TO UPDATE: \n",
-  //       type: "list",
-  //       choices: EmployeeList
-  //     },
-  //     {
-  //       name: "whatRole",
-  //       message: "SELECT THE NEW ROLE FOR THIS EMPLOYEE: \n",
-  //       type: "list",
-  //       choices: allRoles,
-  //     },
-  //   ])
-  //   .then((answer) => {
-  //     let idOfRole = 0;
-  //     for (let x = 0; x < allRoles.length; x++) {
-  //       if (answer.whatRole == allRoles[x]) {
-  //         idOfRole = x + 1;
-  //       }
-  //     }
+  inquirer
+    .prompt([
+      {
+        name: "confirmation",
+        message: "YOU ARE ABOUT TO UPDATE AN EMPLOYEE'S ROLE. PRESS ENTER TO CONTINUE:",
+        type: "list",
+        choices: ["PRESS ENTER"]
+      },
+      {
+        name: "whatEmployee",
+        message: "SELECT THE EMPLOYEE YOU WANT TO UPDATE: \n",
+        type: "list",
+        choices: employeeList
+      },
+      {
+        name: "whatRole",
+        message: "SELECT THE NEW ROLE FOR THIS EMPLOYEE: \n",
+        type: "list",
+        choices: allRoles,
+      },
+    ])
+    .then((answer) => {
+      let idOfRole = 0;
+      for (let x = 0; x < allRoles.length; x++) {
+        if (answer.whatRole == allRoles[x]) {
+          idOfRole = x + 1;
+        }
+      }
 
-  //     let idOfEmployee = 0;
-  //     for (let u = 0; u < allEmployees.length; u++) {
-  //       if (answer.whatEmployee == allEmployees[u]) {
-  //         idOfEmployee = u + 1;
-  //       }
-  //     }
+      let idOfEmployee = 0;
+      for (let u = 0; u < employeeList.length; u++) {
+        if (answer.whatEmployee == employeeList[u]) {
+          idOfEmployee = u + 1;
+        }
+      }
 
-  //     let sql = `
-  // UPDATE employees
-  // SET role_id = ${idOfRole}
-  // WHERE id = ${idOfEmployee};
-  // `;
-  //     db.query(sql, (error, result) => {
-  //       if (error) throw error;
-  //       console.log(
-  //         `\n ${answer.whatEmployee}'S ROLE HAS BEEN UPDATED TO ${answer.whatRole}! \n `
-  //       );
-  //       mainMenu();
-  //     });
-  //   });
+      let sql = `
+  UPDATE employees
+  SET role_id = ${idOfRole}
+  WHERE id = ${idOfEmployee};
+  `;
+      db.query(sql, (error, result) => {
+        if (error) throw error;
+        console.log(
+          `\n ${answer.whatEmployee}'S ROLE HAS BEEN UPDATED TO ${answer.whatRole}! \n `
+        );
+        mainMenu();
+      });
+    });
 }
