@@ -95,15 +95,16 @@ function viewRoles() {
 //NOT DISPLAYING EMPLOYEES THAT HAVE NO MANAGERS
 function viewEmployees() {
   let sql = `
-      SELECT emp.id, emp.first_name, emp.last_name, ro.title, dep.name AS department, ro.salary, CONCAT(m.first_name, " ", m.last_name) AS reports_to
-      FROM employees AS emp
-      JOIN roles AS ro
-      ON emp.role_id = ro.id
-      JOIN departments AS dep
-      ON ro.department_id = dep.id
-      JOIN employees m
-      ON emp.manager_id = m.id
-      ORDER BY emp.id;
+    SELECT employees.id, employees.first_name, employees.last_name, title, name AS department, salary,
+    CONCAT(emp.first_name, " ", emp.last_name) AS manager
+    FROM employees
+    LEFT JOIN roles
+    ON employees.role_id = roles.id
+    LEFT JOIN departments
+    ON roles.department_id = departments.id
+    LEFT JOIN employees emp
+    ON employees.manager_id = emp.id
+    ORDER BY employees.id;
       `;
   db.query(sql, (error, result) => {
     if (error) throw error;
@@ -147,7 +148,6 @@ function addRole() {
       allDepartments.push(result[i].name);
       i++;
     }
-    // console.log("curent departments are: " + allDepartments);
   });
 
   inquirer
@@ -249,24 +249,25 @@ function addEmployee() {
 }
 
 function updateEmployeeRole() {
- //Calling helper function
-  let allEmployees = getAllEmployees(); 
- //Calling helper function
+  //Calling helper function
+  let allEmployees = getAllEmployees();
+  //Calling helper function
   let allRoles = getAllRoles();
 
   inquirer
     .prompt([
       {
         name: "confirmation",
-        message: "YOU ARE ABOUT TO UPDATE AN EMPLOYEE'S ROLE. PRESS ENTER TO CONTINUE:",
+        message:
+          "YOU ARE ABOUT TO UPDATE AN EMPLOYEE'S ROLE. PRESS ENTER TO CONTINUE:",
         type: "list",
-        choices: ["PRESS ENTER"]
+        choices: ["PRESS ENTER"],
       },
       {
         name: "whatEmployee",
         message: "SELECT THE EMPLOYEE YOU WANT TO UPDATE: \n",
         type: "list",
-        choices: allEmployees
+        choices: allEmployees,
       },
       {
         name: "whatRole",
@@ -304,7 +305,6 @@ function updateEmployeeRole() {
       });
     });
 }
-
 
 //HELPER FUNCTION for getting employees
 function getAllEmployees() {
